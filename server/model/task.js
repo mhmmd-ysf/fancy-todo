@@ -4,7 +4,8 @@ let TaskSchema = new mongoose.Schema({
   name: String,
   description: String,
   checkStatus: Boolean,
-  dueDate: Date
+  dueDate: Date,
+  userId: String
 })
 
 let Task = mongoose.model('Task', TaskSchema)

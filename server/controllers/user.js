@@ -17,7 +17,8 @@ class ControllerUser {
       .then(data => {
         const token = jwt.sign({
           name: data.name,
-          username: data.username
+          username: data.username,
+          id: data._id
         }, process.env.JWT_SECRET)
         res.status(201).json({ token })
       })
@@ -59,7 +60,6 @@ class ControllerUser {
   static login(req, res) {
     User.findOne({username: req.body.username})
       .then(user => {
-        console.log('masuk')
         console.log(user)
         if(user === null) {
           res.status(401).json({message: 'Invaild username/password'})
@@ -68,18 +68,57 @@ class ControllerUser {
           if (!bcrypt.compareSync(req.body.password, user.password)) {
             res.status(401).json({message: 'Invalid username/password'})
           } else {
+            console.log('siap buat token')
             const token = jwt.sign({
               name: user.name,
-              username: user.username
+              username: user.username,
+              id: user._id
             }, process.env.JWT_SECRET)
             req.headers.token = token
-            res.status(200).json({ token })
+            console.log('siap balikin token')
+            res.status(200).json({
+              token,
+              name: user.name,
+              username: user.username,
+              id: user._id
+            })
           }
         }
       })
       .catch(err => {
         res.status(500).json({message: err.message})
       })
+  }
+  static googleSignIn(req, res) {
+    const { id_token } = req.body
+    client.verifyIdToken({
+      id_token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    })
+    .then(ticket => {
+      const payload = ticket.getPayload()
+      User.findOne({ email: payload.email })
+        .then(user => {
+          if(!user) {
+            return User.create({
+              name: `${payload.given_name} ${payload.family_name}`,
+              email: payload.email,
+              password: bcrypt.hashSync('12345', 10)
+            })
+          } else {
+            return Promise.resolve(user)
+          }
+        })
+        .then(user => {
+          const token = jwt.sign({
+            name: user.name,
+            email: user.email,
+            id: data._id
+          }, process.env.JWT_SECRET)
+          res.status(201).json({token})
+        })
+        .catch(err => res.status(500).json({message: err.message}))
+    })
   }
 }
 
