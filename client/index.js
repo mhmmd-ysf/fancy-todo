@@ -34,8 +34,9 @@ function getTasks() {
         <td>${item.checkStatus}</td>
         <td>${item.dueDate}</td>
         <td><button class="btn btn-primary" onclick="checkTask('${item._id}')" value="${item._id}">Check</button>
-        <button class="btn btn-primary" onclick="editTask('${item._id}')">Edit</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Edit</button>
         <button class="btn btn-primary" onclick="deleteTask('${item._id}')">Delete</button></td></tr>`)
+        /* punya button edit -> onclick="editTask('${item._id}')" */
       }
     })
     .fail(err => {
@@ -64,7 +65,7 @@ function createTask() {
     <td>${item.checkStatus}</td>
     <td>${item.dueDate}</td>
     <td><button class="btn btn-primary" onclick="checkTask('${item._id}')" value="${item._id}">Check</button>
-    <button class="btn btn-primary" onclick="editTask('${item._id}')">Edit</button>
+    <button class="btn btn-primary" onclick="editTask('${item._id}')" data-toggle="modal" data-target="#exampleModal">Edit</button>
     <button class="btn btn-primary" onclick="deleteTask('${item._id}')">Delete</button></td></tr>`)
   })
   .fail(err => {
